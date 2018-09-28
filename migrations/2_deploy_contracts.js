@@ -4,6 +4,7 @@ const GeneralPermissionManagerFactory = artifacts.require('./GeneralPermissionMa
 const PercentageTransferManagerFactory = artifacts.require('./PercentageTransferManagerFactory.sol')
 const USDTieredSTOProxyFactory = artifacts.require('./USDTieredSTOProxyFactory.sol');
 const CountTransferManagerFactory = artifacts.require('./CountTransferManagerFactory.sol')
+const VolumeRestrictionTransferManagerFactory = artifacts.require('./VolumeRestrictionTransferManagerFactory.sol')
 const EtherDividendCheckpointFactory = artifacts.require('./EtherDividendCheckpointFactory.sol')
 const ERC20DividendCheckpointFactory = artifacts.require('./ERC20DividendCheckpointFactory.sol')
 const ModuleRegistry = artifacts.require('./ModuleRegistry.sol');
@@ -149,6 +150,10 @@ const functionSignatureProxyMR = {
       // to track the counts of the investors of the security token)
       return deployer.deploy(CountTransferManagerFactory, PolyToken, 0, 0, 0, {from: PolymathAccount});
     }).then(() => {
+      // D) Deploy the VolumeRestrictionTransferManagerFactory Contract (Factory used to generate the VolumeRestrictionTransferManager contract use
+      // to track the counts of the investors of the security token)
+      return deployer.deploy(VolumeRestrictionTransferManagerFactory, PolyToken, 0, 0, 0, {from: PolymathAccount});
+    }).then(() => {
       // D) Deploy the PercentageTransferManagerFactory Contract (Factory used to generate the PercentageTransferManager contract use
       // to track the percentage of investment the investors could do for a particular security token)
       return deployer.deploy(PercentageTransferManagerFactory, PolyToken, 0, 0, 0, {from: PolymathAccount});
@@ -172,6 +177,10 @@ const functionSignatureProxyMR = {
       // D) Register the CountTransferManagerFactory in the ModuleRegistry to make the factory available at the protocol level.
       // So any securityToken can use that factory to generate the CountTransferManager contract.
       return moduleRegistry.registerModule(CountTransferManagerFactory.address, {from: PolymathAccount});
+    }).then(() => {
+      // D) Register the VolumeRestrictionTransferManagerFactory in the ModuleRegistry to make the factory available at the protocol level.
+      // So any securityToken can use that factory to generate the VolumeRestrictionTransferManager contract.
+      return moduleRegistry.registerModule(VolumeRestrictionTransferManagerFactory.address, {from: PolymathAccount});
     }).then(() => {
       // D) Register the GeneralTransferManagerFactory in the ModuleRegistry to make the factory available at the protocol level.
       // So any securityToken can use that factory to generate the GeneralTransferManager contract.
@@ -202,6 +211,11 @@ const functionSignatureProxyMR = {
       // contract, Factory should comes under the verified list of factories or those factories deployed by the securityToken issuers only.
       // Here it gets verified because it is deployed by the third party account (Polymath Account) not with the issuer accounts.
       return moduleRegistry.verifyModule(CountTransferManagerFactory.address, true, {from: PolymathAccount});
+    }).then(() => {
+      // G) Once the VolumeRestrictionTransferManagerFactory registered with the ModuleRegistry contract then for making them accessble to the securityToken
+      // contract, Factory should comes under the verified list of factories or those factories deployed by the securityToken issuers only.
+      // Here it gets verified because it is deployed by the third party account (Polymath Account) not with the issuer accounts.
+      return moduleRegistry.verifyModule(VolumeRestrictionTransferManagerFactory.address, true, {from: PolymathAccount});
     }).then(() => {
       // G) Once the PercentageTransferManagerFactory registered with the ModuleRegistry contract then for making them accessble to the securityToken
       // contract, Factory should comes under the verified list of factories or those factories deployed by the securityToken issuers only.
@@ -304,6 +318,7 @@ const functionSignatureProxyMR = {
       USDTieredSTOProxyFactory:          ${USDTieredSTOProxyFactory.address}
 
       CountTransferManagerFactory:       ${CountTransferManagerFactory.address}
+      VolumeRestrictionTransferManagerFactory: ${VolumeRestrictionTransferManagerFactory.address}
       PercentageTransferManagerFactory:  ${PercentageTransferManagerFactory.address}
       ManualApprovalTransferManagerFactory:
                                          ${ManualApprovalTransferManagerFactory.address}
